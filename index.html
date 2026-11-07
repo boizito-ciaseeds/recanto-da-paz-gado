@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Fazenda Recanto da Paz</title>
+<style>
+:root{
+  --bordo:#7B1C2E;--bordo-escuro:#5A1421;--dourado:#C8A84B;
+  --texto:#2C1810;--texto-2:#6b5a50;--fundo:#F8F5F0;--neutro:#E8E0D5;--card:#FFFFFF;
+  --critico:#D32F2F;--critico-bg:#FFCCCC;--atencao:#F9A825;--atencao-bg:#FFF2CC;--sucesso:#388E3C;--sucesso-bg:#D9EAD3;
+  --sombra:0 2px 8px rgba(0,0,0,.08);
+  box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  color-scheme:dark;--texto:#F1E9E2;--texto-2:#bfae9f;--fundo:#1b1412;--neutro:#33282a;--card:#251c1b;
+  --critico-bg:#4a1d1d;--atencao-bg:#463a12;--sucesso-bg:#1d3a20;--sombra:0 2px 8px rgba(0,0,0,.4);
+}}
+:root[data-theme="dark"]{
+  color-scheme:dark;--texto:#F1E9E2;--texto-2:#bfae9f;--fundo:#1b1412;--neutro:#33282a;--card:#251c1b;
+  --critico-bg:#4a1d1d;--atencao-bg:#463a12;--sucesso-bg:#1d3a20;--sombra:0 2px 8px rgba(0,0,0,.4);
+}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--fundo);color:var(--texto);font-family:Calibri,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:16px}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bordo)}
+header{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bordo);color:#fff;border-bottom:3px solid var(--dourado)}
+.topo{display:flex;align-items:center;gap:12px;padding:12px 16px;max-width:1100px;margin:0 auto}
+.topo h1{font-size:1.15rem;margin:0;font-weight:700}
+.topo small{display:block;opacity:.8;font-size:.8rem}
+.sync{margin-left:auto;font-size:.75rem;opacity:.85;text-align:right}
+nav{display:flex;max-width:1100px;margin:0 auto}
+nav button{flex:1;background:none;border:0;color:#fff;opacity:.7;padding:10px 4px;font:inherit;font-weight:700;border-bottom:3px solid transparent;cursor:pointer}
+nav button.ativo{opacity:1;border-bottom-color:var(--dourado)}
+main{max-width:1100px;margin:0 auto;padding:16px}
+.view{display:none}.view.ativo{display:block}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:16px}
+.card{background:var(--card);border-radius:12px;box-shadow:var(--sombra);padding:14px}
+.kpi{border-top:4px solid var(--dourado)}
+.kpi b{display:block;font-size:2rem;color:var(--bordo);line-height:1.1}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .kpi b,:root:not([data-theme="light"]) h2{color:var(--dourado)}}
+:root[data-theme="dark"] .kpi b,:root[data-theme="dark"] h2{color:var(--dourado)}
+.kpi span{color:var(--texto-2);font-size:.85rem}
+h2{color:var(--bordo);font-size:1.05rem;margin:0 0 10px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px}
+.barra{display:flex;align-items:center;gap:8px;margin:6px 0;font-size:.9rem}
+.barra .nome{width:90px;flex-shrink:0}
+.barra .trilho{flex:1;background:var(--neutro);border-radius:6px;height:14px;overflow:hidden}
+.barra .enche{height:100%;background:var(--bordo)}
+.barra .n{width:40px;text-align:right;font-weight:700}
+.filtros{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.filtros input,.filtros select{flex:1;min-width:140px}
+input,select,textarea{font:inherit;color:var(--texto);background:var(--card);border:1px solid var(--neutro);border-radius:8px;padding:10px;width:100%}
+input:focus,select:focus{outline:2px solid var(--dourado);border-color:transparent}
+label{display:block;font-size:.85rem;font-weight:700;margin-bottom:4px;color:var(--texto-2)}
+.form{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.btn{background:var(--bordo);color:#fff;border:0;border-radius:8px;padding:12px 16px;font:inherit;font-weight:700;cursor:pointer}
+.btn:hover{background:var(--bordo-escuro)}
+.btn.sec{background:transparent;color:var(--texto);border:1px solid var(--neutro)}
+.btn.ouro{background:var(--dourado);color:#2C1810}
+.tabela{overflow-x:auto;border-radius:12px;box-shadow:var(--sombra)}
+table{width:100%;border-collapse:collapse;background:var(--card);min-width:720px}
+th{background:var(--bordo);color:#fff;text-align:left;padding:10px;font-size:.85rem;white-space:nowrap}
+td{padding:10px;border-top:1px solid var(--neutro);font-size:.9rem;word-wrap:break-word}
+tbody tr:nth-child(even){background:color-mix(in srgb,var(--neutro) 45%,var(--card))}
+tbody tr{cursor:pointer}tbody tr:hover{outline:2px solid var(--dourado);outline-offset:-2px}
+td.num{text-align:right;font-variant-numeric:tabular-nums}
+.tag{display:inline-block;padding:2px 8px;border-radius:999px;font-size:.78rem;font-weight:700}
+.t-ativo{background:var(--sucesso-bg);color:var(--sucesso)}
+.t-vendido{background:var(--atencao-bg);color:#9a6a00}
+.t-morto{background:var(--critico-bg);color:var(--critico)}
+.gmd-ok{color:var(--sucesso);font-weight:700}.gmd-med{color:#b07c00;font-weight:700}.gmd-ruim{color:var(--critico);font-weight:700}
+.vazio{text-align:center;color:var(--texto-2);padding:30px}
+.alerta{background:var(--atencao-bg);border-left:4px solid var(--atencao);padding:10px 12px;border-radius:8px;margin-bottom:12px;font-size:.9rem}
+dialog{border:0;border-radius:14px;padding:0;width:min(560px,94vw);background:var(--card);color:var(--texto);box-shadow:0 10px 40px rgba(0,0,0,.35)}
+dialog::backdrop{background:rgba(0,0,0,.45)}
+.dlg-topo{background:var(--bordo);color:#fff;padding:14px 16px;border-bottom:3px solid var(--dourado);display:flex;justify-content:space-between;align-items:center}
+.dlg-topo h3{margin:0}
+.dlg-corpo{padding:16px;max-height:70vh;overflow-y:auto}
+.linha{display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap}
+.linha>div{flex:1;min-width:120px}
+.info{display:grid;grid-template-columns:1fr 1fr;gap:6px 12px;font-size:.9rem;margin-bottom:14px}
+.info span{color:var(--texto-2)}
+.pes{list-style:none;padding:0;margin:8px 0}
+.pes li{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--neutro);font-size:.9rem}
+.x{background:none;border:0;color:var(--critico);cursor:pointer;font-size:1rem}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--bordo-escuro);color:#fff;padding:10px 18px;border-radius:8px;opacity:0;transition:.3s;pointer-events:none;z-index:20}
+.toast.on{opacity:1}
+footer{text-align:center;color:var(--texto-2);font-size:.75rem;padding:20px}
+</style>
+</head>
+<body>
+<header>
+  <div class="topo">
+    <svg width="36" height="36" viewBox="0 0 40 40" aria-hidden="true"><polygon points="20,2 36,11 36,29 20,38 4,29 4,11" fill="#5A1421" stroke="#C8A84B" stroke-width="2"/><polygon points="20,10 28,15 28,25 20,30 12,25 12,15" fill="none" stroke="#C8A84B" stroke-width="1.5"/></svg>
+    <div><h1>Fazenda Recanto da Paz</h1><small>Controle de Gado</small></div>
+    <div class="sync" id="sync">Salvo neste celular</div>
+  </div>
+  <nav>
+    <button data-v="painel" class="ativo">Painel</button>
+    <button data-v="rebanho">Rebanho</button>
+    <button data-v="vacinas">Vacinas</button>
+    <button data-v="novo">+ Cadastrar</button>
+  </nav>
+</header>
+
+<main>
+  <!-- PAINEL -->
+  <section class="view ativo" id="v-painel">
+    <div id="avisos"></div>
+    <div class="kpis">
+      <div class="card kpi"><b id="k-ativos">0</b><span>Cabeças ativas</span></div>
+      <div class="card kpi"><b id="k-peso">–</b><span>Peso médio atual (kg)</span></div>
+      <div class="card kpi"><b id="k-arroba">–</b><span>Total em @ (vivo ÷ 30)</span></div>
+      <div class="card kpi"><b id="k-gmd">–</b><span>GMD médio (kg/dia)</span></div>
+    </div>
+    <div class="grid2">
+      <div class="card"><h2>Por fazenda</h2><div id="g-fazenda"></div></div>
+      <div class="card"><h2>Por proprietário</h2><div id="g-prop"></div></div>
+      <div class="card"><h2>Por categoria</h2><div id="g-categoria"></div></div>
+      <div class="card"><h2>Saídas</h2><div id="g-saidas"></div></div>
+      <div class="card"><h2>Cópia de segurança</h2>
+        <p style="font-size:.9rem;margin:0 0 10px">Os dados ficam só neste celular. Salve uma cópia toda semana e mande para o seu WhatsApp ou e-mail.</p>
+        <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn ouro" id="b-backup">Salvar cópia</button><button class="btn sec" id="b-restaurar">Restaurar cópia</button></div>
+        <input type="file" id="f-restaurar" accept=".json,application/json" style="display:none">
+        <p id="ult-backup" style="font-size:.8rem;color:var(--texto-2);margin:8px 0 0"></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- REBANHO -->
+  <section class="view" id="v-rebanho">
+    <div class="filtros">
+      <input id="f-busca" placeholder="Buscar brinco, marca, lote ou raça…">
+      <select id="f-fazenda"><option value="">Todas as fazendas</option></select>
+      <select id="f-prop"><option value="">Todos os proprietários</option></select>
+      <select id="f-status"><option value="ativo">Ativos</option><option value="vendido">Vendidos</option><option value="morto">Mortes</option><option value="">Todos</option></select>
+      <button class="btn ouro" id="b-csv">Exportar CSV</button>
+    </div>
+    <div class="tabela"><table>
+      <thead><tr><th>Brinco / Marca</th><th>Fazenda</th><th>Proprietário</th><th>Lote</th><th>Categoria</th><th>Sexo</th><th>Raça</th><th>Peso atual</th><th>GMD</th><th>Últ. pesagem</th><th>Status</th></tr></thead>
+      <tbody id="lista"></tbody>
+    </table></div>
+    <p style="font-size:.8rem;color:var(--texto-2)">Toque em um animal para registrar pesagem, venda ou morte.</p>
+  </section>
+
+  <!-- VACINAS -->
+  <section class="view" id="v-vacinas">
+    <div class="card" style="margin-bottom:12px">
+      <h2>Vacinar em lote</h2>
+      <div class="form">
+        <div><label>Fazenda</label><select id="v-fazenda"><option value="">Todas</option></select></div>
+        <div><label>Proprietário</label><select id="v-prop"><option value="">Todos</option></select></div>
+        <div><label>Lote / Pasto</label><select id="v-lote"><option value="">Todos</option></select></div>
+        <div><label>Categoria</label><select id="v-cat"><option value="">Todas</option><option>Bezerro(a)</option><option>Garrote</option><option>Novilha</option><option>Boi</option><option>Vaca</option><option>Touro</option></select></div>
+        <div><label>Sexo</label><select id="v-sexo"><option value="">Ambos</option><option>Macho</option><option>Fêmea</option></select></div>
+        <div><label>Vacina / produto *</label><input id="v-nome" list="dl-vacinas" placeholder="Ex.: Clostridioses"></div>
+        <div><label>Data de aplicação *</label><input type="date" id="v-data"></div>
+        <div><label>Próxima dose</label><input type="date" id="v-prox"></div>
+        <div><label>Observações (partida, responsável)</label><input id="v-obs"></div>
+      </div>
+      <div style="margin-top:14px"><button class="btn" id="b-vac-lote">Aplicar em 0 animais</button></div>
+    </div>
+    <div class="card">
+      <h2>Doses atrasadas e próximos 30 dias</h2>
+      <div class="tabela" style="box-shadow:none"><table style="min-width:520px">
+        <thead><tr><th>Brinco / Marca</th><th>Lote</th><th>Vacina</th><th>Próxima dose</th><th>Situação</th></tr></thead>
+        <tbody id="v-lista"></tbody>
+      </table></div>
+    </div>
+  </section>
+
+  <!-- NOVO -->
+  <section class="view" id="v-novo">
+    <div class="card">
+      <h2>Cadastrar animal</h2>
+      <div class="form">
+        <div><label>Brinco nº / Marca *</label><input id="n-brinco" required></div>
+        <div><label>Fazenda *</label><input id="n-fazenda" list="dl-fazendas" value="Fazenda Recanto da Paz"></div>
+        <div><label>Proprietário *</label><select id="n-prop"><option>Domingos</option><option>Neide</option><option>Carlos</option><option value="Outros">Outros</option></select><input id="n-prop-outro" placeholder="Nome do proprietário" style="display:none;margin-top:6px"></div>
+        <div><label>Lote / Pasto</label><input id="n-lote" list="dl-lotes"></div>
+        <div><label>Categoria</label><select id="n-cat"><option>Bezerro(a)</option><option>Garrote</option><option>Novilha</option><option>Boi</option><option>Vaca</option><option>Touro</option></select></div>
+        <div><label>Sexo</label><select id="n-sexo"><option>Macho</option><option>Fêmea</option></select></div>
+        <div><label>Raça</label><input id="n-raca" list="dl-racas" placeholder="Nelore, Angus…"></div>
+        <div><label>Data de entrada *</label><input type="date" id="n-data"></div>
+        <div><label>Peso de entrada (kg)</label><input type="number" inputmode="decimal" id="n-peso" min="1"></div>
+        <div><label>Origem</label><select id="n-origem"><option>Nascimento</option><option>Compra</option><option>Transferência</option></select></div>
+        <div style="grid-column:1/-1"><label>Observações</label><input id="n-obs"></div>
+      </div>
+      <div style="margin-top:14px;display:flex;gap:8px"><button class="btn" id="b-salvar">Salvar animal</button><button class="btn sec" id="b-limpar">Limpar</button></div>
+    </div>
+  </section>
+</main>
+<datalist id="dl-fazendas"></datalist><datalist id="dl-lotes"></datalist>
+<datalist id="dl-vacinas"><option>Clostridioses</option><option>Raiva</option><option>Brucelose</option><option>Leptospirose</option><option>IBR/BVD</option><option>Aftosa</option><option>Vermífugo</option><option>Carrapaticida</option></datalist>
+<datalist id="dl-racas"><option>Nelore</option><option>Angus</option><option>Brangus</option><option>Senepol</option><option>Cruzado</option><option>Girolando</option></datalist>
+
+<dialog id="dlg">
+  <div class="dlg-topo"><h3 id="d-titulo">Animal</h3><button class="x" style="color:#fff;font-size:1.4rem" id="d-fechar" aria-label="Fechar">×</button></div>
+  <div class="dlg-corpo">
+    <div class="info" id="d-info"></div>
+    <h2>Proprietário</h2>
+    <div class="linha" style="margin-bottom:16px">
+      <div><select id="d-prop"><option value="">— escolher —</option><option>Domingos</option><option>Neide</option><option>Carlos</option><option value="Outros">Outros</option></select><input id="d-prop-outro" placeholder="Nome do proprietário" style="display:none;margin-top:6px"></div>
+      <button class="btn sec" id="b-prop">Alterar</button>
+    </div>
+    <h2>Nova pesagem</h2>
+    <div class="linha">
+      <div><label>Data</label><input type="date" id="p-data"></div>
+      <div><label>Peso (kg)</label><input type="number" inputmode="decimal" id="p-peso"></div>
+      <button class="btn" id="b-pesar">Registrar</button>
+    </div>
+    <h2 style="margin-top:16px">Histórico de pesagens</h2>
+    <ul class="pes" id="d-pes"></ul>
+    <h2 style="margin-top:16px">Vacinas e sanidade</h2>
+    <div class="linha">
+      <div><label>Vacina / produto</label><input id="dv-nome" list="dl-vacinas"></div>
+      <div><label>Data</label><input type="date" id="dv-data"></div>
+      <div><label>Próxima dose</label><input type="date" id="dv-prox"></div>
+      <button class="btn" id="b-vac">Registrar</button>
+    </div>
+    <ul class="pes" id="d-vac"></ul>
+    <h2 style="margin-top:16px">Saída / status</h2>
+    <div class="linha">
+      <div><label>Status</label><select id="s-status"><option value="ativo">Ativo</option><option value="vendido">Vendido</option><option value="morto">Morte</option></select></div>
+      <div><label>Data</label><input type="date" id="s-data"></div>
+      <div><label>Motivo / comprador</label><input id="s-motivo"></div>
+      <button class="btn sec" id="b-status">Atualizar</button>
+    </div>
+    <div style="margin-top:18px;text-align:right"><button class="btn sec" style="color:var(--critico)" id="b-excluir">Excluir cadastro</button></div>
+  </div>
+</dialog>
+<div class="toast" id="toast"></div>
+<footer>Fazenda Recanto da Paz · Controle de Gado</footer>
+
+<script>
+(function(){
+  const $=id=>document.getElementById(id);
+  const hoje=()=>new Date().toISOString().slice(0,10);
+  const fmtD=s=>s?s.split('-').reverse().join('/'):'–';
+  const fmtN=(n,d=0)=>(n==null||isNaN(n))?'–':n.toLocaleString('pt-BR',{minimumFractionDigits:d,maximumFractionDigits:d});
+  const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  let animais=[];let col=null;let atual=null;
+
+  function toast(t){const e=$('toast');e.textContent=t;e.classList.add('on');setTimeout(()=>e.classList.remove('on'),2200)}
+
+  // ---------- armazenamento ----------
+  function lerLocal(){try{return JSON.parse(localStorage.getItem('ciaseeds-gado')||'[]')}catch(e){return[]}}
+  function gravarLocal(){try{localStorage.setItem('ciaseeds-gado',JSON.stringify(animais))}catch(e){}}
+  async function salvar(a){
+    if(col){await col.doc(a.id).set(a)}else{const i=animais.findIndex(x=>x.id===a.id);if(i<0)animais.push(a);else animais[i]=a;gravarLocal();render()}
+  }
+  async function excluir(id){
+    if(col){await col.doc(id).delete()}else{animais=animais.filter(x=>x.id!==id);gravarLocal();render()}
+  }
+
+  // ---------- cálculos ----------
+  function pesagens(a){return [...(a.pesagens||[])].sort((x,y)=>x.data.localeCompare(y.data))}
+  function pesoAtual(a){const p=pesagens(a);return p.length?p[p.length-1].peso:null}
+  function gmd(a){const p=pesagens(a);if(p.length<2)return null;const d=(new Date(p[p.length-1].data)-new Date(p[0].data))/864e5;return d>0?(p[p.length-1].peso-p[0].peso)/d:null}
+  function classeGmd(g){if(g==null)return'';return g>=0.6?'gmd-ok':g>=0.3?'gmd-med':'gmd-ruim'}
+  function diasSemPesar(a){const p=pesagens(a);if(!p.length)return 999;return Math.floor((new Date(hoje())-new Date(p[p.length-1].data))/864e5)}
+
+  // ---------- render ----------
+  function barras(el,obj){
+    const ent=Object.entries(obj).sort((a,b)=>b[1]-a[1]);const max=Math.max(1,...ent.map(e=>e[1]));
+    $(el).innerHTML=ent.length?ent.map(([k,v])=>`<div class="barra"><span class="nome">${esc(k)}</span><div class="trilho"><div class="enche" style="width:${v/max*100}%"></div></div><span class="n">${v}</span></div>`).join(''):'<div class="vazio">Sem dados</div>';
+  }
+  function render(){
+    const ativos=animais.filter(a=>a.status==='ativo');
+    $('k-ativos').textContent=fmtN(ativos.length);
+    const pesos=ativos.map(pesoAtual).filter(x=>x);
+    const soma=pesos.reduce((s,x)=>s+x,0);
+    $('k-peso').textContent=pesos.length?fmtN(soma/pesos.length):'–';
+    $('k-arroba').textContent=pesos.length?fmtN(soma/30):'–';
+    const gs=ativos.map(gmd).filter(x=>x!=null);
+    $('k-gmd').textContent=gs.length?fmtN(gs.reduce((s,x)=>s+x,0)/gs.length,2):'–';
+    const porF={},porC={},sai={Vendidos:0,Mortes:0};
+    ativos.forEach(a=>{porF[a.fazenda||'—']=(porF[a.fazenda||'—']||0)+1;porC[a.categoria]=(porC[a.categoria]||0)+1});
+    animais.forEach(a=>{if(a.status==='vendido')sai.Vendidos++;if(a.status==='morto')sai.Mortes++});
+    const porP={};ativos.forEach(a=>{const k=a.proprietario||'Sem proprietário';porP[k]=(porP[k]||0)+1});barras('g-prop',porP);barras('g-fazenda',porF);barras('g-categoria',porC);barras('g-saidas',sai);
+    const atras=ativos.filter(a=>(a.pesagens||[]).length&&diasSemPesar(a)>60).length;
+    const semPeso=ativos.filter(a=>!(a.pesagens||[]).length).length;
+    const baixo=ativos.filter(a=>{const g=gmd(a);return g!=null&&g<0.3}).length;
+    let av='';
+    if(semPeso)av+=`<div class="alerta"><b>${semPeso}</b> animal(is) ainda sem nenhuma pesagem.</div>`;
+    if(atras)av+=`<div class="alerta"><b>${atras}</b> animal(is) sem pesagem há mais de 60 dias.</div>`;
+    if(baixo)av+=`<div class="alerta" style="background:var(--critico-bg);border-color:var(--critico)"><b>${baixo}</b> animal(is) com GMD abaixo de 0,3 kg/dia — avaliar pasto/sanidade.</div>`;
+    const pend=vacPendentes(),venc=pend.filter(p=>p.d<0).length,prox=pend.filter(p=>p.d>=0&&p.d<=15).length;
+    if(venc)av+=`<div class="alerta" style="background:var(--critico-bg);border-color:var(--critico)"><b>${venc}</b> dose(s) de vacina atrasada(s) — veja a aba Vacinas.</div>`;
+    if(prox)av+=`<div class="alerta"><b>${prox}</b> dose(s) de vacina vencendo nos próximos 15 dias.</div>`;
+    $('avisos').innerHTML=av;
+    // listas auxiliares
+    const fz=[...new Set(animais.map(a=>a.fazenda).filter(Boolean))].sort();
+    const lt=[...new Set(animais.map(a=>a.lote).filter(Boolean))].sort();
+    $('dl-fazendas').innerHTML=fz.map(f=>`<option value="${esc(f)}">`).join('');
+    $('dl-lotes').innerHTML=lt.map(f=>`<option value="${esc(f)}">`).join('');
+    const sel=$('f-fazenda'),v=sel.value;
+    sel.innerHTML='<option value="">Todas as fazendas</option>'+fz.map(f=>`<option ${f===v?'selected':''}>${esc(f)}</option>`).join('');
+    opcoes($('f-prop'),listaProps(),'Todos os proprietários');
+    renderLista();renderVacinas();
+    if(atual&&$('dlg').open){const a=animais.find(x=>x.id===atual);if(a)preencherDlg(a);else $('dlg').close()}
+  }
+  function filtrados(){
+    const b=$('f-busca').value.toLowerCase().trim(),f=$('f-fazenda').value,s=$('f-status').value,pr=$('f-prop').value;
+    return animais.filter(a=>(!s||a.status===s)&&(!f||a.fazenda===f)&&(!pr||a.proprietario===pr)&&(!b||[a.brinco,a.lote,a.raca].join(' ').toLowerCase().includes(b)))
+      .sort((x,y)=>String(x.brinco).localeCompare(String(y.brinco),'pt-BR',{numeric:true}));
+  }
+  function renderLista(){
+    const l=filtrados();
+    $('lista').innerHTML=l.length?l.map(a=>{const g=gmd(a),p=pesagens(a);return`<tr data-id="${esc(a.id)}">
+      <td><b>${esc(a.brinco)}</b></td><td>${esc(a.fazenda)}</td><td>${esc(a.proprietario)||'–'}</td><td>${esc(a.lote)}</td><td>${esc(a.categoria)}</td><td>${esc(a.sexo)}</td><td>${esc(a.raca)}</td>
+      <td class="num">${fmtN(pesoAtual(a))} kg</td><td class="num ${classeGmd(g)}">${g==null?'–':fmtN(g,2)}</td>
+      <td>${p.length?fmtD(p[p.length-1].data):'–'}</td><td><span class="tag t-${a.status}">${a.status==='morto'?'Morte':a.status[0].toUpperCase()+a.status.slice(1)}</span></td></tr>`}).join('')
+      :'<tr><td colspan="11" class="vazio">Nenhum animal encontrado. Use “+ Cadastrar”.</td></tr>';
+  }
+
+  // ---------- navegação ----------
+  document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{
+    document.querySelectorAll('nav button').forEach(x=>x.classList.toggle('ativo',x===b));
+    document.querySelectorAll('.view').forEach(v=>v.classList.toggle('ativo',v.id==='v-'+b.dataset.v));
+    window.scrollTo(0,0);
+  });
+  ['f-busca','f-fazenda','f-status','f-prop'].forEach(id=>$(id).addEventListener('input',renderLista));
+
+  // ---------- cadastro ----------
+  $('n-data').value=hoje();
+  function limpar(){['n-brinco','n-lote','n-peso','n-obs','n-raca'].forEach(i=>$(i).value='');$('n-data').value=hoje()}
+  $('b-limpar').onclick=limpar;
+  $('b-salvar').onclick=async()=>{
+    const brinco=$('n-brinco').value.trim(),faz=$('n-fazenda').value.trim(),peso=parseFloat($('n-peso').value),data=$('n-data').value;
+    if(!brinco||!faz||!data){toast('Preencha brinco/marca, fazenda e data');return}
+    const prop=propVal('n-prop','n-prop-outro');if(!prop){toast('Informe o nome do proprietário');return}
+    const a={id:'a'+Date.now().toString(36)+Math.random().toString(36).slice(2,6),brinco,fazenda:faz,proprietario:prop,lote:$('n-lote').value.trim(),categoria:$('n-cat').value,sexo:$('n-sexo').value,
+      raca:$('n-raca').value.trim(),origem:$('n-origem').value,entrada:data,obs:$('n-obs').value.trim(),status:'ativo',pesagens:peso>0?[{data,peso}]:[],criadoEm:Date.now()};
+    try{await salvar(a);toast('Animal '+brinco+' cadastrado');$('n-brinco').value='';$('n-peso').value='';$('n-brinco').focus()}catch(e){toast('Erro ao salvar: '+(e.message||e.code||''))}
+  };
+
+  // ---------- detalhe ----------
+  $('lista').onclick=e=>{const tr=e.target.closest('tr[data-id]');if(!tr)return;const a=animais.find(x=>x.id===tr.dataset.id);if(!a)return;
+    atual=a.id;preencherDlg(a);$('p-data').value=hoje();$('p-peso').value='';$('s-data').value=a.saidaData||hoje();$('s-motivo').value=a.saidaMotivo||'';$('s-status').value=a.status;setProp('d-prop','d-prop-outro',a.proprietario);$('dv-data').value=hoje();$('dv-nome').value='';$('dv-prox').value='';$('dlg').showModal()};
+  function preencherDlg(a){
+    $('d-titulo').textContent='Animal '+a.brinco;
+    const vs=[...(a.vacinas||[])].sort((x,y)=>y.data.localeCompare(x.data));
+    $('d-vac').innerHTML=vs.length?vs.map(v=>`<li><span>${fmtD(v.data)} · <b>${esc(v.nome)}</b></span><span>${v.proxima?'Próx.: '+fmtD(v.proxima):''} <button class="x" data-v="${esc(v.id)}" aria-label="Remover">×</button></span></li>`).join(''):'<li><span style="color:var(--texto-2)">Nenhuma vacina registrada</span></li>';
+    const g=gmd(a);
+    $('d-info').innerHTML=`<div><span>Fazenda:</span> ${esc(a.fazenda)}</div><div><span>Proprietário:</span> <b>${esc(a.proprietario)||'–'}</b></div><div><span>Lote:</span> ${esc(a.lote)||'–'}</div>
+      <div><span>Categoria:</span> ${esc(a.categoria)}</div><div><span>Sexo:</span> ${esc(a.sexo)}</div>
+      <div><span>Raça:</span> ${esc(a.raca)||'–'}</div><div><span>Origem:</span> ${esc(a.origem)}</div>
+      <div><span>Entrada:</span> ${fmtD(a.entrada)}</div><div><span>GMD:</span> <b class="${classeGmd(g)}">${g==null?'–':fmtN(g,2)+' kg/dia'}</b></div>
+      ${a.obs?`<div style="grid-column:1/-1"><span>Obs.:</span> ${esc(a.obs)}</div>`:''}
+      ${a.status!=='ativo'?`<div style="grid-column:1/-1"><span>Saída:</span> ${a.status==='morto'?'Morte':'Venda'} em ${fmtD(a.saidaData)} ${a.saidaMotivo?'– '+esc(a.saidaMotivo):''}</div>`:''}`;
+    const p=pesagens(a).reverse();
+    $('d-pes').innerHTML=p.map((x,i)=>{const ant=p[i+1];const dif=ant?x.peso-ant.peso:null;
+      return`<li><span>${fmtD(x.data)}</span><span><b>${fmtN(x.peso)} kg</b> ${dif!=null?`<small style="color:${dif>=0?'var(--sucesso)':'var(--critico)'}">${dif>=0?'+':''}${fmtN(dif)}</small>`:''} ${p.length>1?`<button class="x" data-d="${x.data}" data-p="${x.peso}" aria-label="Remover">×</button>`:''}</span></li>`}).join('');
+  }
+  $('d-fechar').onclick=()=>{$('dlg').close();atual=null};
+  function clone(a){return JSON.parse(JSON.stringify(a))}
+  $('b-pesar').onclick=async()=>{
+    const a=animais.find(x=>x.id===atual);const peso=parseFloat($('p-peso').value),data=$('p-data').value;
+    if(!a||!(peso>0)||!data){toast('Informe data e peso');return}
+    const n=clone(a);n.pesagens=(n.pesagens||[]).filter(x=>x.data!==data);n.pesagens.push({data,peso});
+    try{await salvar(n);$('p-peso').value='';toast('Pesagem registrada')}catch(e){toast('Erro ao salvar')}
+  };
+  $('d-pes').onclick=async e=>{const b=e.target.closest('button[data-d]');if(!b)return;const a=animais.find(x=>x.id===atual);if(!a)return;
+    if(!confirm('Remover pesagem de '+fmtD(b.dataset.d)+'?'))return;const n=clone(a);n.pesagens=n.pesagens.filter(x=>x.data!==b.dataset.d);
+    try{await salvar(n);toast('Pesagem removida')}catch(e){toast('Erro ao salvar')}};
+  $('b-status').onclick=async()=>{const a=animais.find(x=>x.id===atual);if(!a)return;const n=clone(a);n.status=$('s-status').value;
+    n.saidaData=n.status==='ativo'?'':$('s-data').value;n.saidaMotivo=n.status==='ativo'?'':$('s-motivo').value.trim();
+    try{await salvar(n);toast('Status atualizado')}catch(e){toast('Erro ao salvar')}};
+  $('b-excluir').onclick=async()=>{const a=animais.find(x=>x.id===atual);if(!a)return;
+    if(!confirm('Excluir definitivamente o animal '+a.brinco+'? Para venda ou morte, use “Saída / status”.'))return;
+    try{await excluir(a.id);$('dlg').close();atual=null;toast('Cadastro excluído')}catch(e){toast('Erro ao excluir')}};
+
+  // ---------- proprietário ----------
+  const PROPS=['Domingos','Neide','Carlos'];
+  function listaProps(){return [...new Set([...PROPS,...animais.map(a=>a.proprietario).filter(Boolean)])]}
+  function propVal(s,i){const v=$(s).value;return v==='Outros'?$(i).value.trim():v}
+  function setProp(s,i,v){const fixo=!v||PROPS.includes(v);$(s).value=fixo?(v||''):'Outros';$(i).value=fixo?'':v;$(i).style.display=fixo?'none':'block'}
+  ['n-prop','d-prop'].forEach(id=>$(id).addEventListener('change',()=>{const o=$(id+'-outro');o.style.display=$(id).value==='Outros'?'block':'none';if(o.style.display==='block')o.focus()}));
+  $('b-prop').onclick=async()=>{const a=animais.find(x=>x.id===atual);if(!a)return;const p=propVal('d-prop','d-prop-outro');if(!p){toast('Escolha ou digite o proprietário');return}
+    const n=clone(a);n.proprietario=p;try{await salvar(n);toast('Proprietário atualizado')}catch(e){toast('Erro ao salvar')}};
+
+  // ---------- vacinas ----------
+  function novoId(){return 'v'+Date.now().toString(36)+Math.random().toString(36).slice(2,6)}
+  function vacPendentes(){const out=[];animais.filter(a=>a.status==='ativo').forEach(a=>{const ult={};(a.vacinas||[]).forEach(v=>{if(!ult[v.nome]||v.data>ult[v.nome].data)ult[v.nome]=v});
+    Object.values(ult).forEach(v=>{if(v.proxima)out.push({a,v,d:Math.floor((new Date(v.proxima)-new Date(hoje()))/864e5)})})});return out.sort((x,y)=>x.d-y.d)}
+  function ultVac(a){const v=[...(a.vacinas||[])].sort((x,y)=>y.data.localeCompare(x.data))[0];return v?v.nome+' '+fmtD(v.data):''}
+  function alvoLote(){const f=$('v-fazenda').value,l=$('v-lote').value,c=$('v-cat').value,s=$('v-sexo').value,pr=$('v-prop').value;
+    return animais.filter(a=>a.status==='ativo'&&(!f||a.fazenda===f)&&(!l||a.lote===l)&&(!c||a.categoria===c)&&(!s||a.sexo===s)&&(!pr||a.proprietario===pr))}
+  function opcoes(sel,lista,todos){const v=sel.value;sel.innerHTML=`<option value="">${todos}</option>`+lista.map(x=>`<option ${x===v?'selected':''}>${esc(x)}</option>`).join('')}
+  function contarLote(){const n=alvoLote().length;$('b-vac-lote').textContent=`Aplicar em ${n} ${n===1?'animal':'animais'}`}
+  function renderVacinas(){
+    const ativos=animais.filter(a=>a.status==='ativo');
+    opcoes($('v-fazenda'),[...new Set(ativos.map(a=>a.fazenda).filter(Boolean))].sort(),'Todas');
+    const f=$('v-fazenda').value;
+    opcoes($('v-lote'),[...new Set(ativos.filter(a=>!f||a.fazenda===f).map(a=>a.lote).filter(Boolean))].sort(),'Todos');
+    opcoes($('v-prop'),listaProps(),'Todos');
+    contarLote();
+    const p=vacPendentes().filter(x=>x.d<=30);
+    $('v-lista').innerHTML=p.length?p.map(({a,v,d})=>`<tr data-id="${esc(a.id)}"><td><b>${esc(a.brinco)}</b></td><td>${esc(a.lote)||'–'}</td><td>${esc(v.nome)}</td><td>${fmtD(v.proxima)}</td><td><span class="tag ${d<0?'t-morto':d<=15?'t-vendido':'t-ativo'}">${d<0?'Atrasada '+(-d)+' d':d===0?'Hoje':'Em '+d+' d'}</span></td></tr>`).join('')
+      :'<tr><td colspan="5" class="vazio">Nenhuma dose pendente nos próximos 30 dias.</td></tr>';
+  }
+  $('v-data').value=hoje();
+  $('v-fazenda').addEventListener('change',()=>{$('v-lote').value='';renderVacinas()});
+  ['v-lote','v-cat','v-sexo','v-prop'].forEach(i=>$(i).addEventListener('change',contarLote));
+  $('v-lista').onclick=e=>$('lista').onclick(e);
+  $('b-vac-lote').onclick=async()=>{
+    const alvo=alvoLote(),nome=$('v-nome').value.trim(),data=$('v-data').value;
+    if(!nome||!data){toast('Informe vacina e data');return}
+    if(!alvo.length){toast('Nenhum animal no filtro');return}
+    if(!confirm(`Registrar ${nome} em ${alvo.length} animal(is)?`))return;
+    const reg={nome,data,proxima:$('v-prox').value,obs:$('v-obs').value.trim()};const b=$('b-vac-lote');b.disabled=true;b.textContent='Salvando…';let ok=0;
+    for(let i=0;i<alvo.length;i+=20){await Promise.all(alvo.slice(i,i+20).map(a=>{const n=clone(a);n.vacinas=[...(n.vacinas||[]),{...reg,id:novoId()}];return salvar(n).then(()=>ok++).catch(()=>{})}))}
+    b.disabled=false;contarLote();toast(`${nome} registrada em ${ok} animal(is)`);$('v-nome').value='';$('v-prox').value='';$('v-obs').value='';
+  };
+  $('b-vac').onclick=async()=>{
+    const a=animais.find(x=>x.id===atual),nome=$('dv-nome').value.trim(),data=$('dv-data').value;
+    if(!a||!nome||!data){toast('Informe vacina e data');return}
+    const n=clone(a);n.vacinas=[...(n.vacinas||[]),{id:novoId(),nome,data,proxima:$('dv-prox').value,obs:''}];
+    try{await salvar(n);$('dv-nome').value='';$('dv-prox').value='';toast('Vacina registrada')}catch(e){toast('Erro ao salvar')}
+  };
+  $('d-vac').onclick=async e=>{const b=e.target.closest('button[data-v]');if(!b)return;const a=animais.find(x=>x.id===atual);if(!a)return;
+    if(!confirm('Remover este registro de vacina?'))return;const n=clone(a);n.vacinas=(n.vacinas||[]).filter(v=>v.id!==b.dataset.v);
+    try{await salvar(n);toast('Registro removido')}catch(e){toast('Erro ao salvar')}};
+
+  // ---------- exportação ----------
+  $('b-csv').onclick=async()=>{
+    const cab=['Brinco / Marca','Fazenda','Proprietário','Lote','Categoria','Sexo','Raça','Origem','Entrada','Peso entrada (kg)','Peso atual (kg)','Últ. pesagem','GMD (kg/dia)','Últ. vacina','Status','Data saída','Motivo saída'];
+    const linhas=filtrados().map(a=>{const p=pesagens(a);const g=gmd(a);return[a.brinco,a.fazenda,a.proprietario||'',a.lote,a.categoria,a.sexo,a.raca,a.origem,fmtD(a.entrada),p[0]?fmtN(p[0].peso):'',fmtN(pesoAtual(a)),p.length?fmtD(p[p.length-1].data):'',g==null?'':fmtN(g,2),ultVac(a),a.status,fmtD(a.saidaData),a.saidaMotivo||'']});
+    const csv='\ufeff'+[cab,...linhas].map(l=>l.map(c=>'"'+String(c??'').replace(/"/g,'""')+'"').join(';')).join('\r\n');
+    const nome='rebanho-recanto-da-paz-'+hoje()+'.csv';
+        baixar(nome,csv,'text/csv');
+  };
+
+  // ---------- inicialização ----------
+  animais=lerLocal();render();
+  function baixar(nome,conteudo,tipo){try{const u=URL.createObjectURL(new Blob([conteudo],{type:tipo}));const l=document.createElement('a');l.href=u;l.download=nome;document.body.appendChild(l);l.click();l.remove();setTimeout(()=>URL.revokeObjectURL(u),2000);return true}catch(e){toast('Não foi possível baixar');return false}}
+  function mostrarBackup(){let u='';try{u=localStorage.getItem('rp-ult-backup')||''}catch(e){}$('ult-backup').textContent=u?'Última cópia: '+fmtD(u):'Nenhuma cópia salva ainda.'}
+  $('b-backup').onclick=async()=>{
+    const nome='backup-recanto-da-paz-'+hoje()+'.json',json=JSON.stringify({app:'recanto-da-paz-gado',versao:1,data:hoje(),animais},null,1);
+    try{const f=new File([json],nome,{type:'application/json'});if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f],title:'Backup do rebanho'});}else baixar(nome,json,'application/json')}
+    catch(e){if(e&&e.name==='AbortError')return;baixar(nome,json,'application/json')}
+    try{localStorage.setItem('rp-ult-backup',hoje())}catch(e){}mostrarBackup();
+  };
+  $('b-restaurar').onclick=()=>$('f-restaurar').click();
+  $('f-restaurar').onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const d=JSON.parse(r.result);const lista=Array.isArray(d)?d:d.animais;if(!Array.isArray(lista))throw 0;
+      if(!confirm('Restaurar '+lista.length+' animais desta cópia? Os dados atuais deste celular serão substituídos.'))return;animais=lista;gravarLocal();render();toast('Cópia restaurada')}catch(x){toast('Arquivo de cópia inválido')}e.target.value=''};r.readAsText(f)};
+  mostrarBackup();
+})();
+</script>
+</body>
+</html>
