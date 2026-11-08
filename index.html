@@ -175,7 +175,8 @@ footer{text-align:center;color:var(--texto-2);font-size:.75rem;padding:20px}
     <div class="card">
       <h2>Cadastrar animal</h2>
       <div class="form">
-        <div><label>Brinco nº / Marca *</label><input id="n-brinco" required></div>
+        <div><label>Marca *</label><select id="n-marca"><option>DG</option><option>ND</option><option>CS</option><option value="OUTRO">OUTRO</option></select><input id="n-marca-outro" placeholder="Digite a marca" style="display:none;margin-top:6px"></div>
+        <div><label>Brinco nº</label><input id="n-brinco" inputmode="numeric"></div>
         <div><label>Fazenda *</label><input id="n-fazenda" list="dl-fazendas" value="Fazenda Recanto da Paz"></div>
         <div><label>Proprietário *</label><select id="n-prop"><option>Domingos</option><option>Neide</option><option>Carlos</option><option value="Outros">Outros</option></select><input id="n-prop-outro" placeholder="Nome do proprietário" style="display:none;margin-top:6px"></div>
         <div><label>Lote / Pasto</label><input id="n-lote" list="dl-lotes"></div>
@@ -325,13 +326,15 @@ footer{text-align:center;color:var(--texto-2);font-size:.75rem;padding:20px}
 
   // ---------- cadastro ----------
   $('n-data').value=hoje();
+  $('n-marca').addEventListener('change',()=>{const o=$('n-marca-outro');o.style.display=$('n-marca').value==='OUTRO'?'block':'none';if(o.style.display==='block')o.focus()});
   function limpar(){['n-brinco','n-lote','n-peso','n-obs','n-raca'].forEach(i=>$(i).value='');$('n-data').value=hoje()}
   $('b-limpar').onclick=limpar;
   $('b-salvar').onclick=async()=>{
-    const brinco=$('n-brinco').value.trim(),faz=$('n-fazenda').value.trim(),peso=parseFloat($('n-peso').value),data=$('n-data').value;
-    if(!brinco||!faz||!data){toast('Preencha brinco/marca, fazenda e data');return}
+    const marca=$('n-marca').value==='OUTRO'?$('n-marca-outro').value.trim():$('n-marca').value;if(!marca){toast('Digite a marca');$('n-marca-outro').focus();return}
+    const brinco=[marca,$('n-brinco').value.trim()].filter(Boolean).join(' '),faz=$('n-fazenda').value.trim(),peso=parseFloat($('n-peso').value),data=$('n-data').value;
+    if(!faz||!data){toast('Preencha marca, fazenda e data');return}
     const prop=propVal('n-prop','n-prop-outro');if(!prop){toast('Informe o nome do proprietário');return}
-    const a={id:'a'+Date.now().toString(36)+Math.random().toString(36).slice(2,6),brinco,fazenda:faz,proprietario:prop,lote:$('n-lote').value.trim(),categoria:$('n-cat').value,sexo:$('n-sexo').value,
+    const a={id:'a'+Date.now().toString(36)+Math.random().toString(36).slice(2,6),brinco,marca,fazenda:faz,proprietario:prop,lote:$('n-lote').value.trim(),categoria:$('n-cat').value,sexo:$('n-sexo').value,
       raca:$('n-raca').value.trim(),origem:$('n-origem').value,entrada:data,obs:$('n-obs').value.trim(),status:'ativo',pesagens:peso>0?[{data,peso}]:[],criadoEm:Date.now()};
     try{await salvar(a);toast('Animal '+brinco+' cadastrado');$('n-brinco').value='';$('n-peso').value='';$('n-brinco').focus()}catch(e){toast('Erro ao salvar: '+(e.message||e.code||''))}
   };
