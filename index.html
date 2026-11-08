@@ -99,6 +99,7 @@ footer{text-align:center;color:var(--texto-2);font-size:.75rem;padding:20px}
   <nav>
     <button data-v="painel" class="ativo">Painel</button>
     <button data-v="rebanho">Rebanho</button>
+    <button data-v="piquetes">Piquetes</button>
     <button data-v="vacinas">Vacinas</button>
     <button data-v="novo">+ Cadastrar</button>
   </nav>
@@ -191,6 +192,19 @@ footer{text-align:center;color:var(--texto-2);font-size:.75rem;padding:20px}
       <div style="margin-top:14px;display:flex;gap:8px"><button class="btn" id="b-salvar">Salvar animal</button><button class="btn sec" id="b-limpar">Limpar</button></div>
     </div>
   </section>
+<section class="view" id="v-piquetes">
+<div class="card"><h2>Controle de piquetes</h2><p>Registre cada período de ocupação. A saída pode ser preenchida depois. Este controle não transfere animais automaticamente.</p>
+<form id="pq-form"><div class="form">
+<div><label for="pq-num">Piquete</label><select id="pq-num"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></div>
+<div><label for="pq-pasto">Tipo de pasto</label><select id="pq-pasto"><option value="">Não informado</option><option>Agroplo</option><option>Massai</option><option>Braquiara</option></select></div>
+<div><label for="pq-entrada">Data de entrada *</label><input id="pq-entrada" type="date" required></div>
+<div><label for="pq-saida">Data de saída</label><input id="pq-saida" type="date"></div>
+<div><label for="pq-obs">Lote / observações</label><input id="pq-obs"></div>
+</div><p><button class="btn" type="submit">Salvar período</button> <button class="btn sec" id="pq-cancelar" type="button">Limpar</button></p><p id="pq-msg" role="status"></p></form></div>
+<div class="grid2" id="pq-cards" style="margin-top:12px"></div>
+<div class="card" style="margin-top:12px"><h2>Histórico de entrada e saída</h2><div id="pq-historico"></div></div>
+<p>Os registros ficam neste navegador, sem sincronização entre celulares. Incluídos na cópia de segurança.</p>
+</section>
 </main>
 <datalist id="dl-fazendas"></datalist><datalist id="dl-lotes"></datalist>
 <datalist id="dl-vacinas"><option>Clostridioses</option><option>Raiva</option><option>Brucelose</option><option>Leptospirose</option><option>IBR/BVD</option><option>Aftosa</option><option>Vermífugo</option><option>Carrapaticida</option></datalist>
@@ -441,15 +455,32 @@ footer{text-align:center;color:var(--texto-2);font-size:.75rem;padding:20px}
   function baixar(nome,conteudo,tipo){try{const u=URL.createObjectURL(new Blob([conteudo],{type:tipo}));const l=document.createElement('a');l.href=u;l.download=nome;document.body.appendChild(l);l.click();l.remove();setTimeout(()=>URL.revokeObjectURL(u),2000);return true}catch(e){toast('Não foi possível baixar');return false}}
   function mostrarBackup(){let u='';try{u=localStorage.getItem('rp-ult-backup')||''}catch(e){}$('ult-backup').textContent=u?'Última cópia: '+fmtD(u):'Nenhuma cópia salva ainda.'}
   $('b-backup').onclick=async()=>{
-    const nome='backup-recanto-da-paz-'+hoje()+'.json',json=JSON.stringify({app:'recanto-da-paz-gado',versao:1,data:hoje(),animais},null,1);
+    const nome='backup-recanto-da-paz-'+hoje()+'.json',json=JSON.stringify({app:'recanto-da-paz-gado',versao:1,data:hoje(),animais,piquetes:JSON.parse(localStorage.getItem('rp-piquetes-v1')||'[]')},null,1);
     try{const f=new File([json],nome,{type:'application/json'});if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f],title:'Backup do rebanho'});}else baixar(nome,json,'application/json')}
     catch(e){if(e&&e.name==='AbortError')return;baixar(nome,json,'application/json')}
     try{localStorage.setItem('rp-ult-backup',hoje())}catch(e){}mostrarBackup();
   };
   $('b-restaurar').onclick=()=>$('f-restaurar').click();
   $('f-restaurar').onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const d=JSON.parse(r.result);const lista=Array.isArray(d)?d:d.animais;if(!Array.isArray(lista))throw 0;
-      if(!confirm('Restaurar '+lista.length+' animais desta cópia? Os dados atuais deste celular serão substituídos.'))return;animais=lista;gravarLocal();render();toast('Cópia restaurada')}catch(x){toast('Arquivo de cópia inválido')}e.target.value=''};r.readAsText(f)};
+      if(!confirm('Restaurar '+lista.length+' animais desta cópia? Os dados atuais deste celular serão substituídos.'))return;if(d.piquetes!==undefined){if(!Array.isArray(d.piquetes))throw 0;localStorage.setItem('rp-piquetes-v1',JSON.stringify(d.piquetes));window.dispatchEvent(new Event('rp-piquetes-restaurados'))}animais=lista;gravarLocal();render();toast('Cópia restaurada')}catch(x){toast('Arquivo de cópia inválido')}e.target.value=''};r.readAsText(f)};
   mostrarBackup();
+})();
+</script>
+<script>
+(function(){
+const $=id=>document.getElementById(id),key='rp-piquetes-v1';let edit=null;
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const date=s=>s?s.split('-').reverse().join('/'):'Em aberto';
+function read(){try{const a=JSON.parse(localStorage.getItem(key)||'[]');return Array.isArray(a)?a:[]}catch(e){return[]}}
+function reset(){$('pq-form').reset();edit=null;}
+function render(){const a=read();$('pq-cards').innerHTML=[1,2,3,4,5].map(n=>{const rows=a.filter(x=>x.piquete===String(n)).sort((x,y)=>y.entrada.localeCompare(x.entrada));const x=rows.find(x=>!x.saida)||rows[0];return `<div class="card"><h2>Piquete ${n}</h2>${x?`<p>${esc(x.pasto)||'Pasto não informado'}</p><p>Entrada: ${date(x.entrada)}<br>Saída: ${date(x.saida)}</p><button class="btn sec" data-edit="${esc(x.id)}">Editar período</button>`:'Nenhum período registrado'}</div>`}).join('');
+$('pq-historico').innerHTML=a.length?a.slice().sort((x,y)=>y.entrada.localeCompare(x.entrada)).map(x=>`<div style="border-bottom:1px solid var(--neutro);padding:12px 0"><b>Piquete ${esc(x.piquete)}</b> · ${esc(x.pasto)||'Pasto não informado'}<br>Entrada: ${date(x.entrada)} · Saída: ${date(x.saida)}<br>${esc(x.obs)} <button class="btn sec" data-edit="${esc(x.id)}">Editar</button></div>`).join(''):'Nenhum período registrado.';}
+$('pq-form').onsubmit=e=>{e.preventDefault();const entrada=$('pq-entrada').value,saida=$('pq-saida').value;if(!entrada||(saida&&saida<entrada)){$('pq-msg').textContent='A saída não pode ser anterior à entrada.';return}const a=read(),x={id:edit||('p'+Date.now().toString(36)+Math.random().toString(36).slice(2)),piquete:$('pq-num').value,pasto:$('pq-pasto').value,entrada,saida,obs:$('pq-obs').value.trim()};
+if(a.some(y=>y.id!==x.id&&y.piquete===x.piquete&&x.entrada<(y.saida||'9999-12-31')&&y.entrada<(x.saida||'9999-12-31'))){$('pq-msg').textContent='Este piquete já tem um período sobreposto. Edite o registro existente ou ajuste as datas.';return}
+const i=a.findIndex(y=>y.id===edit);if(i>=0)a[i]=x;else a.push(x);try{localStorage.setItem(key,JSON.stringify(a));reset();render();$('pq-msg').textContent='Período salvo neste aparelho.'}catch(err){$('pq-msg').textContent='Não foi possível salvar. Faça uma cópia de segurança e verifique o armazenamento.'}};
+$('v-piquetes').addEventListener('click',e=>{const b=e.target.closest('[data-edit]');if(!b)return;const x=read().find(x=>x.id===b.dataset.edit);if(!x)return;edit=x.id;$('pq-num').value=x.piquete;$('pq-pasto').value=x.pasto;$('pq-entrada').value=x.entrada;$('pq-saida').value=x.saida;$('pq-obs').value=x.obs;$('pq-msg').textContent='Editando período. Preencha a saída e salve.';$('pq-form').scrollIntoView({behavior:'smooth',block:'center'})});
+$('pq-cancelar').onclick=()=>{reset();$('pq-msg').textContent=''};
+window.addEventListener('rp-piquetes-restaurados',render);window.addEventListener('storage',render);render();
 })();
 </script>
 </body>
