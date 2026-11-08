@@ -293,7 +293,7 @@ footer{text-align:center;color:var(--texto-2);font-size:.75rem;padding:20px}
     $('avisos').innerHTML=av;
     // listas auxiliares
     const fz=[...new Set(['Fazenda Recanto da Paz',...animais.map(a=>a.fazenda).filter(Boolean)])].sort();
-    const lt=[...new Set(animais.map(a=>a.lote).filter(Boolean))].sort();
+    const lt=[...new Set(['Agroplo','Massai','Braquiara',...animais.map(a=>a.lote).filter(Boolean)])].sort();
     $('dl-fazendas').innerHTML=fz.map(f=>`<option value="${esc(f)}">`).join('');
     $('dl-lotes').innerHTML=lt.map(f=>`<option value="${esc(f)}">`).join('');
     const sel=$('f-fazenda'),v=sel.value;
